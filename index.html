@@ -566,7 +566,7 @@ function doSubmitOne(rec, onDone) {
   }
   if (rec._typeValue) html += '<input type="hidden" name="' + PARDOT.FIELDS.TypeOfClients + '" value="' + rec._typeValue + '">';
   if (rec._salesValue) html += '<input type="hidden" name="' + PARDOT.FIELDS.salesman + '" value="' + rec._salesValue + '">';
-  html += '</form><script>document.getElementById("f").submit();<' + '/script></body></html>';
+  html += '</form><body onload="document.getElementById(\'f\').submit()"></body></html>';
   var win = window.open('', '_blank');
   if (!win) { alert('请允许弹出窗口'); onDone(false); return; }
   win.document.write(html);
