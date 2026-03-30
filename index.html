@@ -554,23 +554,41 @@ function doSubmitOne(rec, onDone) {
     onDone(false);
     return;
   }
-  var textFields = { Name: rec.Name, Company: rec.Company, email: rec.email, Website: rec.Website, Title: rec.Title, Nation: rec.Nation, Continent: rec.Continent, Address: rec.Address, Phone: rec.Phone, Mobile: rec.Mobile, InterestedIn: rec.InterestedIn, DemandDetails: rec.DemandDetails };
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Submit</title></head><body>';
-  html += '<form id="f" method="POST" action="' + PARDOT.FORM_URL + '">';
-  html += '<input type="hidden" name="_utf8" value="&#9731;">';
-  for (var f in textFields) {
-    var v = textFields[f];
-    if (v && String(v).trim()) {
-      html += '<input type="hidden" name="' + PARDOT.FIELDS[f] + '" value="' + String(v).replace(/"/g,'&quot;').replace(/</g,'&lt;') + '">';
-    }
+  // 创建隐藏 form 直接在当前页面提交，target="_blank" 在新窗口打开结果
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = PARDOT.FORM_URL;
+  form.target = '_blank';
+  form.style.display = 'none';
+
+  function addField(name, value) {
+    if (!value || !String(value).trim()) return;
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
   }
-  if (rec._typeValue) html += '<input type="hidden" name="' + PARDOT.FIELDS.TypeOfClients + '" value="' + rec._typeValue + '">';
-  if (rec._salesValue) html += '<input type="hidden" name="' + PARDOT.FIELDS.salesman + '" value="' + rec._salesValue + '">';
-  html += '</form><body onload="document.getElementById(\'f\').submit()"></body></html>';
-  var win = window.open('', '_blank');
-  if (!win) { alert('请允许弹出窗口'); onDone(false); return; }
-  win.document.write(html);
-  win.document.close();
+
+  addField('_utf8', '✓');
+  addField(PARDOT.FIELDS.Name, rec.Name);
+  addField(PARDOT.FIELDS.Company, rec.Company);
+  addField(PARDOT.FIELDS.email, rec.email);
+  addField(PARDOT.FIELDS.Website, rec.Website);
+  addField(PARDOT.FIELDS.Title, rec.Title);
+  addField(PARDOT.FIELDS.Nation, rec.Nation);
+  addField(PARDOT.FIELDS.Continent, rec.Continent);
+  addField(PARDOT.FIELDS.Address, rec.Address);
+  addField(PARDOT.FIELDS.Phone, rec.Phone);
+  addField(PARDOT.FIELDS.Mobile, rec.Mobile);
+  addField(PARDOT.FIELDS.InterestedIn, rec.InterestedIn);
+  addField(PARDOT.FIELDS.DemandDetails, rec.DemandDetails);
+  if (rec._typeValue) addField(PARDOT.FIELDS.TypeOfClients, rec._typeValue);
+  if (rec._salesValue) addField(PARDOT.FIELDS.salesman, rec._salesValue);
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
   onDone(true);
 }
 
