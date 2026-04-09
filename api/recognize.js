@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   try {
     const API_KEY = process.env.OPENROUTER_API_KEY;
-    const MODEL = process.env.MODEL_NAME || 'qwen/qwen-2-vl-7b-instruct:free';
+    const MODEL = process.env.MODEL_NAME || 'qwen/qwen3.6-plus';
 
     if (!API_KEY) {
       return res.status(500).json({ error: 'OPENROUTER_API_KEY not configured' });
