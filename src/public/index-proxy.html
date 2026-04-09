@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RIIFO LeadCapture AI</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0D0D0D; min-height: 100vh; color: #333; }
+    .header { background: white; color: #ED2939; padding: 16px; position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-text { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: #ED2939; }
+    .nav { background: white; display: flex; border-bottom: 1px solid #333; position: sticky; top: 60px; z-index: 20; }
+    .nav button { flex: 1; padding: 12px; background: none; border: none; font-size: 14px; font-weight: 500; color: #808080; border-bottom: 2px solid transparent; cursor: pointer; }
+    .nav button.active { color: #ED2939; border-bottom-color: #ED2939; }
+    .page { padding: 16px; display: none; background: #0D0D0D; min-height: calc(100vh - 60px); }
+    .page.active { display: block; }
+    .upload-zone { border: 2px dashed #444; border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; background: #1A1A1A; margin-bottom: 16px; }
+    .upload-zone .icon { font-size: 48px; margin-bottom: 8px; }
+    .upload-zone p { color: #ccc; font-weight: 500; }
+    .upload-zone span { color: #888; font-size: 13px; display: block; margin-top: 4px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; border: none; font-size: 14px; transition: opacity 0.15s; }
+    .btn:active { opacity: 0.8; }
+    .btn-primary { background: #ED2939; color: white; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-lg { padding: 14px 24px; font-size: 16px; }
+    .w-full { width: 100%; }
+    .preview { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+    .preview-item { position: relative; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-item button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.7); color: white; border: none; cursor: pointer; font-size: 14px; }
+    .customer-card { background: #1A1A1A; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden; }
+    .card-header { background: #ED2939; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .card-header .title { font-weight: 600; font-size: 15px; }
+    .card-body { padding: 16px; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-item { display: flex; flex-direction: column; gap: 4px; }
+    .field-item.full { grid-column: span 2; }
+    .field-item label { font-size: 12px; color: #888; font-weight: 500; }
+    .field-item input, .field-item textarea, .field-item select {
+      padding: 9px 12px; border: 1px solid #333; border-radius: 8px; font-size: 14px;
+      background: #1A1A1A; transition: border-color 0.15s; width: 100%; color: #fff;
+    }
+    .field-item input:focus, .field-item textarea:focus, .field-item select:focus {
+      outline: none; border-color: #ED2939; background: white; color: #333;
+    }
+    .card-footer { padding: 12px 16px; border-top: 1px solid #333; display: flex; gap: 10px; }
+    .loading { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .loading.show { display: flex; }
+    .loading-box { background: #1A1A1A; padding: 32px; border-radius: 16px; text-align: center; max-width: 300px; width: 90%; }
+    .loading-box p { margin-top: 16px; color: #ccc; }
+    .progress { margin-top: 16px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; }
+    .progress-bar { height: 100%; background: #ED2939; width: 0%; transition: width 0.3s; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 24px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 200; }
+    .toast.show { opacity: 1; }
+    .batch-bar { padding: 16px; position: sticky; bottom: 0; background: #1A1A1A; border-top: 1px solid #333; z-index: 10; }
+</style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-text">RIIFO LeadCapture AI</div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="active" data-tab="upload" onclick="switchTab('upload')">📤 上传识别</button>
+    <button data-tab="records" onclick="switchTab('records')">📋 客户记录 <span id="record-count"></span></button>
+  </nav>
+
+  <main>
+    <section id="page-upload" class="page active">
+      <input type="file" id="file-input" accept="image/*" multiple style="display:none">
+      <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
+      <input type="file" id="gallery-input" accept="image/*" multiple style="display:none">
+
+      <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📷</div>
+        <p>点击或拖拽上传图片</p>
+        <span>支持名片、登记表、二维码</span>
+      </div>
+
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-primary w-full" onclick="document.getElementById('camera-input').click()">📸 拍照</button>
+        <button class="btn btn-secondary w-full" onclick="document.getElementById('gallery-input').click()">🖼️ 相册</button>
+      </div>
+
+      <div id="preview" class="preview"></div>
+
+      <div style="margin-top:16px">
+        <button class="btn btn-primary btn-lg w-full" onclick="startRecognize()">🤖 开始识别</button>
+      </div>
+    </section>
+
+    <section id="page-records" class="page">
+      <div id="records-empty" class="empty-state">
+        <div class="icon">📋</div>
+        <p>暂无识别记录</p>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="switchTab('upload')">去上传图片</button>
+      </div>
+      <div id="records-list"></div>
+      <div id="batch-bar" class="batch-bar" style="display:none">
+        <button class="btn btn-primary" onclick="submitAll()">📮 全部提交到 Pardot</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="loading" class="loading">
+    <div class="loading-box">
+      <div style="font-size:48px">⏳</div>
+      <p id="loading-text">AI 识别中...</p>
+      <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+// ============== 配置：代理服务器地址 ==============
+var PROXY_URL = window.location.origin + '/recognize';
+// ===============================================
+
+var state = { images: [], records: [] };
+
+var PARDOT = {
+  FORM_URL: 'https://go.rifeng.com/l/900071/2026-03-26/3tbjg2',
+  FIELDS: {
+    Name: '900071_290995pi_900071_290995',
+    Company: '900071_290998pi_900071_290998',
+    email: '900071_291001pi_900071_291001',
+    Website: '900071_291106pi_900071_291106',
+    Title: '900071_291109pi_900071_291109',
+    Nation: '900071_291112pi_900071_291112',
+    Continent: '900071_291115pi_900071_291115',
+    Address: '900071_291118pi_900071_291118',
+    Phone: '900071_291121pi_900071_291121',
+    Mobile: '900071_291163pi_900071_291163',
+    InterestedIn: '900071_291124pi_900071_291124',
+    TypeOfClients: '900071_291127pi_900071_291127',
+    DemandDetails: '900071_291130pi_900071_291130',
+    salesman: '900071_291133pi_900071_291133'
+  },
+  TYPE_OPTIONS: [
+    { label: '', value: '' },
+    { label: 'Manufacturer', value: '2531719' },
+    { label: 'Developer', value: '2531722' },
+    { label: 'Contractor', value: '2531725' },
+    { label: 'Plumbing company', value: '2531728' },
+    { label: 'Wholesaler', value: '2531731' },
+    { label: 'Retailer', value: '2531734' },
+    { label: 'Distributor', value: '2531737' },
+    { label: 'Trading Company', value: '2531740' },
+    { label: 'Consultant', value: '2531743' },
+    { label: 'Architect', value: '2531746' },
+    { label: 'Plumber', value: '2531749' },
+    { label: 'Others', value: '2531752' },
+    { label: 'Designers', value: '2531755' }
+  ],
+  SALESMAN_OPTIONS: [
+    { label: '', value: '' },
+{ label: '谢勇', value: '2533149' },
+{ label: '邓丽萍', value: '2533152' },
+{ label: '雪清', value: '2533155' },
+{ label: '姚婉荧', value: '2533158' },
+{ label: '廖剑波', value: '2533161' },
+{ label: '程晨', value: '2533164' },
+{ label: '源子文', value: '2533167' },
+{ label: '林英杰', value: '2533170' },
+{ label: '陈晓薇', value: '2533173' },
+{ label: '张玉成', value: '2533176' },
+{ label: '周玉霞', value: '2533179' },
+{ label: '李莹莹', value: '2533182' },
+{ label: '高志君', value: '2533185' },
+{ label: '阳丽莎', value: '2533188' },
+{ label: '刘慧琪', value: '2533230' },
+{ label: '周莉昕', value: '2533245' },
+{ label: '黄志恒', value: '2533317' },
+{ label: '周妍妍', value: '2533326' },
+{ label: '沈晓峰', value: '2533356' },
+{ label: '龚海兰', value: '2533431' },
+{ label: '王立文', value: '2533446' },
+{ label: '吴俊杰', value: '2533449' },
+{ label: '周锐鹏', value: '2533455' },
+{ label: '张正仪', value: '2533458' },
+{ label: '张玉萍', value: '2533461' },
+{ label: '肖添', value: '2533464' },
+{ label: '曾滔', value: '2533467' },
+{ label: '李云鑫', value: '2533485' },
+{ label: '陈晓倩', value: '2533509' },
+{ label: '陈翔', value: '2533518' },
+{ label: '袁皙雯', value: '2533521' },
+{ label: '冯霖艳', value: '2533527' },
+{ label: '莫美华', value: '2533530' },
+{ label: '邹伟烨', value: '2533542' },
+{ label: '陈雅琪', value: '2533554' },
+{ label: '王雅琪', value: '2533557' },
+{ label: '蔡庚淇', value: '2533560' },
+{ label: '朱红颖', value: '2533566' },
+{ label: '杨晶莹', value: '2533569' },
+{ label: '孙雯静', value: '2533614' },
+{ label: '罗漫绢', value: '2533617' },
+{ label: '殷梓杰', value: '2533620' }
+  ]
+};
+
+function genId() { return 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); }
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2500); }
+function switchTab(tab) {
+  document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('active',p.id==='page-'+tab);});
+  if(tab==='records')renderRecords();
+}
+
+document.getElementById('file-input').addEventListener('change', function(e) { handleFiles(e.target.files); });
+document.getElementById('camera-input').addEventListener('change', function(e) { handleFiles(e.target.files); });
+document.getElementById('gallery-input').addEventListener('change', function(e) { handleFiles(e.target.files); });
+
+var dropZone = document.querySelector('.upload-zone');
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.style.borderColor = '#ED2939'; });
+dropZone.addEventListener('dragleave', function() { dropZone.style.borderColor = '#444'; });
+dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.style.borderColor = '#444'; handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files) {
+  Array.from(files).forEach(function(f) {
+    if (!f.type.startsWith('image/')) return;
+    state.images.push({ id: genId(), file: f, url: URL.createObjectURL(f) });
+  });
+  updatePreview();
+}
+
+function removeImage(id) {
+  state.images = state.images.filter(function(i) { return i.id !== id; });
+  updatePreview();
+  showToast('已删除');
+}
+
+function clearAll() {
+  state.images.forEach(function(i) { URL.revokeObjectURL(i.url); });
+  state.images = [];
+  updatePreview();
+}
+
+function updatePreview() {
+  var el = document.getElementById('preview');
+  if (!state.images.length) { el.innerHTML = ''; return; }
+  el.innerHTML = state.images.map(function(img) {
+    return '<div class="preview-item"><img src="' + img.url + '"><button onclick="removeImage(\'' + img.id + '\')">×</button></div>';
+  }).join('') + '<button class="btn btn-secondary" onclick="clearAll()" style="width:100px;height:100px;font-size:24px">🗑️</button>';
+}
+
+function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
+function maybe(v) { return Math.random() > 0.2 ? v : ''; }
+
+function generateMock(file) {
+  var names = ['张伟','李娜','王芳','刘洋','陈明','杨丽','赵强','黄敏','周杰','吴婷'];
+  var companies = ['上海科技有限公司','广州贸易有限公司','深圳电子集团','北京咨询公司','杭州互联网公司'];
+  var titles = ['总经理','销售总监','采购经理','技术主管','市场经理'];
+  var nations = ['China','USA','Germany','Japan','Korea','Vietnam','India'];
+  var continents = { China:'Asia', USA:'North America', Germany:'Europe', Japan:'Asia', Korea:'Asia', Vietnam:'Asia', India:'Asia' };
+  var name = rnd(names);
+  var nation = rnd(nations);
+  return {
+    id: genId(),
+    Name: name,
+    Title: rnd(titles),
+    email: name.toLowerCase() + '@example.com',
+    Website: maybe('www.' + rnd(companies).replace(/有限|贸易|科技|集团|咨询|互联网/g,'').toLowerCase() + '.com'),
+    Address: maybe('上海市浦东新区张江路' + Math.floor(Math.random()*1000) + '号'),
+    Company: rnd(companies),
+    Continent: continents[nation],
+    Nation: nation,
+    Phone: maybe('021-' + Math.floor(Math.random()*90000000+10000000)),
+    Mobile: '1' + Math.floor(Math.random()*90000000000+3000000000),
+    TypeOfClients: '',
+    InterestedIn: maybe('管材,管件,阀门'),
+    DemandDetails: maybe('寻找新型管材供应商'),
+    salesman: ''
+  };
+}
+
+async function callAI(files) {
+  var prompt = 'Extract customer info from business card/registration form images. Return a JSON array. Use ONLY these exact field names: Name, Title, email, Website, Address, Company, Continent, Nation, Phone, Mobile, TypeOfClients, InterestedIn, DemandDetails, salesman. Rules: (1) Use English field names only. (2) Nation should be English country name. (3) Continent: Asia/Europe/North America/South America/Africa/Oceania. (4) salesman: only from "Filled by" field, leave empty if not found. (5) Return valid JSON array only, no markdown.';
+  var imageContents = [];
+  for (var i = 0; i < files.length; i++) {
+    var base64 = await new Promise(function(resolve, reject) {
+      var r = new FileReader(); r.onload = function() { resolve(r.result.split(',')[1]); }; r.onerror = reject; r.readAsDataURL(files[i]);
+    });
+    imageContents.push({ type: 'image_url', image_url: { url: 'data:' + files[i].type + ';base64,' + base64 } });
+  }
+  // 调用代理服务（API Key 在服务器端）
+  var resp = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: [{ role: 'user', content: [{ type: 'text', text: prompt }].concat(imageContents) }] })
+  });
+  if (!resp.ok) throw new Error('API error ' + resp.status);
+  var data = await resp.json();
+  var content = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+  var parsed;
+  try { parsed = JSON.parse(content); } catch(e) {
+    var m = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (m) { try { parsed = JSON.parse(m[1].trim()); } catch(e2) {} }
+    if (!parsed) { m = content.match(/\[[\s\S]*\]/); if (m) { try { parsed = JSON.parse(m[0]); } catch(e3) {} } }
+    if (!parsed) throw new Error('Cannot parse response');
+  }
+  if (!Array.isArray(parsed)) parsed = [parsed];
+  var fields = ['Name','Title','email','Website','Address','Company','Continent','Nation','Phone','Mobile','TypeOfClients','InterestedIn','DemandDetails','salesman'];
+  return parsed.map(function(item) {
+    var r = { id: genId() };
+    fields.forEach(function(f) { r[f] = String(item[f] || '').trim(); });
+    return r;
+  });
+}
+
+async function startRecognize() {
+  if (!state.images.length) { alert('请先上传图片'); return; }
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('loading-text').textContent = 'AI 识别中...';
+  var bar = document.getElementById('progress-bar'); bar.style.width = '0%';
+  var prog = 0; var iv = setInterval(function() { prog = Math.min(prog + Math.random()*12, 85); bar.style.width = prog + '%'; }, 250);
+  try {
+    var records = await callAI(state.images.map(function(i) { return i.file; }));
+    clearInterval(iv); bar.style.width = '100%';
+    setTimeout(function() {
+      state.records = records;
+      document.getElementById('loading').classList.remove('show');
+      switchTab('records');
+      showToast('识别完成！共 ' + records.length + ' 条记录');
+    }, 400);
+  } catch(err) {
+    clearInterval(iv);
+    document.getElementById('loading').classList.remove('show');
+    alert('识别失败：' + err.message);
+  }
+}
+
+function renderRecords() {
+  var empty = document.getElementById('records-empty');
+  var list = document.getElementById('records-list');
+  var countEl = document.getElementById('record-count');
+  var batchBar = document.getElementById('batch-bar');
+  if (!state.records.length) { empty.style.display = 'block'; list.innerHTML = ''; countEl.textContent = ''; batchBar.style.display = 'none'; return; }
+  empty.style.display = 'none';
+  batchBar.style.display = state.records.length > 1 ? 'block' : 'none';
+  countEl.textContent = '(' + state.records.length + ')';
+
+  var typeOpts = PARDOT.TYPE_OPTIONS.map(function(o) { return '<option value="' + o.value + '">' + o.label + '</option>'; }).join('');
+  var salesOpts = PARDOT.SALESMAN_OPTIONS.map(function(o) { return '<option value="' + o.value + '">' + o.label + '</option>'; }).join('');
+
+  list.innerHTML = state.records.map(function(rec, idx) {
+    return '<div class="customer-card">' +
+      '<div class="card-header"><span class="title">客户 ' + (idx+1) + '</span><span>' + (rec.Name || '未识别') + '</span></div>' +
+      '<div class="card-body">' +
+        '<div class="field-grid">' +
+          '<div class="field-item"><label>姓名 Name</label><input type="text" id="f-' + rec.id + '-Name" value="' + esc(rec.Name) + '"></div>' +
+          '<div class="field-item"><label>公司 Company</label><input type="text" id="f-' + rec.id + '-Company" value="' + esc(rec.Company) + '"></div>' +
+          '<div class="field-item"><label>邮箱 Email *</label><input type="email" id="f-' + rec.id + '-email" value="' + esc(rec.email) + '" required></div>' +
+          '<div class="field-item"><label>职位 Title</label><input type="text" id="f-' + rec.id + '-Title" value="' + esc(rec.Title) + '"></div>' +
+          '<div class="field-item"><label>国家 Nation</label><input type="text" id="f-' + rec.id + '-Nation" value="' + esc(rec.Nation) + '"></div>' +
+          '<div class="field-item"><label>洲 Continent</label><input type="text" id="f-' + rec.id + '-Continent" value="' + esc(rec.Continent) + '"></div>' +
+          '<div class="field-item"><label>电话 Phone</label><input type="text" id="f-' + rec.id + '-Phone" value="' + esc(rec.Phone) + '"></div>' +
+          '<div class="field-item"><label>手机 Mobile</label><input type="text" id="f-' + rec.id + '-Mobile" value="' + esc(rec.Mobile) + '"></div>' +
+          '<div class="field-item"><label>网址 Website</label><input type="text" id="f-' + rec.id + '-Website" value="' + esc(rec.Website) + '"></div>' +
+          '<div class="field-item"><label>客户类型 Type</label><select id="f-' + rec.id + '-TypeOfClients"><option value="">请选择</option>' + typeOpts + '</select></div>' +
+          '<div class="field-item"><label>感兴趣产品</label><input type="text" id="f-' + rec.id + '-InterestedIn" value="' + esc(rec.InterestedIn) + '"></div>' +
+          '<div class="field-item"><label>销售员</label><select id="f-' + rec.id + '-salesman"><option value="">请选择</option>' + salesOpts + '</select></div>' +
+          '<div class="field-item full"><label>地址 Address</label><input type="text" id="f-' + rec.id + '-Address" value="' + esc(rec.Address) + '"></div>' +
+          '<div class="field-item full"><label>需求详情 Demand Details</label><textarea id="f-' + rec.id + '-DemandDetails">' + esc(rec.DemandDetails) + '</textarea></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card-footer">' +
+        '<button class="btn btn-success btn-lg w-full" onclick="submitRecord(\'' + rec.id + '\')">📮 提交到 Pardot</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  state.records.forEach(function(rec) {
+    var typeVal = ''; PARDOT.TYPE_OPTIONS.forEach(function(o) { if (o.label === rec.TypeOfClients) typeVal = o.value; });
+    var salesVal = ''; PARDOT.SALESMAN_OPTIONS.forEach(function(o) { if (o.label === rec.salesman) salesVal = o.value; });
+    var typeEl = document.getElementById('f-' + rec.id + '-TypeOfClients');
+    var salesEl = document.getElementById('f-' + rec.id + '-salesman');
+    if (typeEl && typeVal) typeEl.value = typeVal;
+    if (salesEl && salesVal) salesEl.value = salesVal;
+  });
+}
+
+function getRecordData(id) {
+  var rec = state.records.find(function(r) { return r.id === id; });
+  if (!rec) return null;
+  var fields = ['Name','Company','email','Title','Nation','Continent','Phone','Mobile','Website','InterestedIn','Address','DemandDetails'];
+  fields.forEach(function(f) {
+    var el = document.getElementById('f-' + id + '-' + f);
+    if (el) rec[f] = el.value;
+  });
+  var typeEl = document.getElementById('f-' + id + '-TypeOfClients');
+  var salesEl = document.getElementById('f-' + id + '-salesman');
+  rec._typeValue = typeEl ? typeEl.value : '';
+  rec._salesValue = salesEl ? salesEl.value : '';
+  return rec;
+}
+
+function doSubmitOne(rec, onDone) {
+  if (!rec.email || !rec.email.trim()) {
+    showToast('❌ 客户' + (state.records.indexOf(rec) + 1) + ' 邮箱为空，已跳过');
+    onDone(false);
+    return;
+  }
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = PARDOT.FORM_URL;
+  form.target = '_blank';
+  form.style.display = 'none';
+
+  function addField(name, value) {
+    if (!value || !String(value).trim()) return;
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+
+  addField('_utf8', '✓');
+  addField(PARDOT.FIELDS.Name, rec.Name);
+  addField(PARDOT.FIELDS.Company, rec.Company);
+  addField(PARDOT.FIELDS.email, rec.email);
+  addField(PARDOT.FIELDS.Website, rec.Website);
+  addField(PARDOT.FIELDS.Title, rec.Title);
+  addField(PARDOT.FIELDS.Nation, rec.Nation);
+  addField(PARDOT.FIELDS.Continent, rec.Continent);
+  addField(PARDOT.FIELDS.Address, rec.Address);
+  addField(PARDOT.FIELDS.Phone, rec.Phone);
+  addField(PARDOT.FIELDS.Mobile, rec.Mobile);
+  addField(PARDOT.FIELDS.InterestedIn, rec.InterestedIn);
+  addField(PARDOT.FIELDS.DemandDetails, rec.DemandDetails);
+  if (rec._typeValue) addField(PARDOT.FIELDS.TypeOfClients, rec._typeValue);
+  if (rec._salesValue) addField(PARDOT.FIELDS.salesman, rec._salesValue);
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+  onDone(true);
+}
+
+function submitAll() {
+  if (!state.records.length) { showToast('暂无记录可提交'); return; }
+  var total = state.records.length;
+  var idx = 0;
+  var success = 0;
+  var skipped = 0;
+  var totalEmails = state.records.filter(function(r) { return r.email && r.email.trim(); }).length;
+  if (!confirm('确认批量提交 ' + total + ' 条客户信息到 Pardot？\n（其中 ' + totalEmails + ' 条有邮箱）\n\n将依次提交客户信息，全部提交完成后请确认提交结果，如有问题请按提示修改后重新提交！')) return;
+  showToast('开始批量提交... 第 1/' + total);
+  function next() {
+    if (idx >= state.records.length) {
+      showToast('✅ 批量提交完成！成功 ' + success + ' 条，跳过 ' + skipped + ' 条（无邮箱）');
+      return;
+    }
+    var rec = getRecordData(state.records[idx].id);
+    var pos = idx + 1;
+    if (!rec.email || !rec.email.trim()) {
+      skipped++;
+      idx++;
+      next();
+      return;
+    }
+    doSubmitOne(rec, function(ok) {
+      if (ok) success++;
+      idx++;
+      if (idx < state.records.length) {
+        showToast('已提交 ' + pos + '/' + total + '，继续...');
+        setTimeout(next, 500);
+      } else {
+        if (success > 0) {
+          showToast('✅ 批量提交完成！成功 ' + success + ' 条，跳过 ' + skipped + ' 条');
+        }
+      }
+    });
+  }
+  next();
+}
+
+function submitRecord(id) {
+  var rec = getRecordData(id);
+  if (!rec) return;
+  if (!rec.email || !rec.email.trim()) { alert('❌ 邮箱为必填字段'); return; }
+  if (!confirm('确认提交到 Pardot？\n\n📧 ' + rec.email + '\n🏢 ' + (rec.Company || '-') + '\n👤 ' + (rec.Name || '-'))) return;
+  doSubmitOne(rec, function(ok) {
+    if (ok) {
+      // 不自动删除，让用户手动确认后再删除
+      showToast('✅ 已在新窗口提交，请确认 Pardot 结果后手动删除记录');
+    } else {
+      showToast('❌ 提交失败，请重试');
+    }
+  });
+}
+
+function deleteRecord(id) {
+  if (!confirm('确定删除这条记录？')) return;
+  state.records = state.records.filter(function(r) { return r.id !== id; });
+  renderRecords();
+  showToast('已删除');
+}
+</script>
+</body>
+</html>
