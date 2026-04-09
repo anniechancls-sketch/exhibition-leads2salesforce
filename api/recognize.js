@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   try {
     const API_KEY = process.env.OPENROUTER_API_KEY;
-    const MODEL = process.env.MODEL_NAME || 'qwen/qwen3.5-flash-02-23';
+    const MODEL = process.env.MODEL_NAME || 'google/gemini-2.5-pro-preview:free';
 
     if (!API_KEY) {
       return res.status(500).json({ error: 'OPENROUTER_API_KEY not configured' });
