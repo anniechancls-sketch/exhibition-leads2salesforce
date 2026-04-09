@@ -78,19 +78,19 @@
 
       <div class="upload-zone" onclick="document.getElementById('file-input').click()">
         <div class="icon">📷</div>
-        <p>点击或拖拽上传图�?/p>
+        <p>点击或拖拽上传图片</p>
         <span>支持名片、登记表、二维码</span>
       </div>
 
       <div style="display:flex;gap:12px">
         <button class="btn btn-primary w-full" onclick="document.getElementById('camera-input').click()">📸 拍照</button>
-        <button class="btn btn-secondary w-full" onclick="document.getElementById('gallery-input').click()">🖼�?相册</button>
+        <button class="btn btn-secondary w-full" onclick="document.getElementById('gallery-input').click()">🖼️ 相册</button>
       </div>
 
       <div id="preview" class="preview"></div>
 
       <div style="margin-top:16px">
-        <button class="btn btn-primary btn-lg w-full" onclick="startRecognize()">🤖 开始识�?/button>
+        <button class="btn btn-primary btn-lg w-full" onclick="startRecognize()">🤖 开始识别</button>
       </div>
     </section>
 
@@ -98,19 +98,19 @@
       <div id="records-empty" class="empty-state">
         <div class="icon">📋</div>
         <p>暂无识别记录</p>
-        <button class="btn btn-primary" style="margin-top:12px" onclick="switchTab('upload')">去上传图�?/button>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="switchTab('upload')">去上传图片</button>
       </div>
       <div id="records-list"></div>
       <div id="batch-bar" class="batch-bar" style="display:none">
-        <button class="btn btn-primary" onclick="submitAll()">📮 全部提交�?Pardot</button>
+        <button class="btn btn-primary" onclick="submitAll()">📮 全部提交到 Pardot</button>
       </div>
     </section>
   </main>
 
   <div id="loading" class="loading">
     <div class="loading-box">
-      <div style="font-size:48px">�?/div>
-      <p id="loading-text">AI 识别�?..</p>
+      <div style="font-size:48px">🤖</div>
+      <p id="loading-text">AI 识别中...</p>
       <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
     </div>
   </div>
@@ -161,47 +161,47 @@ var PARDOT = {
   SALESMAN_OPTIONS: [
     { label: '', value: '' },
 { label: '谢勇', value: '2533149' },
-{ label: '邓丽�?, value: '2533152' },
+{ label: '邓丽娟', value: '2533152' },
 { label: '雪清', value: '2533155' },
-{ label: '姚婉�?, value: '2533158' },
-{ label: '廖剑�?, value: '2533161' },
+{ label: '姚婉君', value: '2533158' },
+{ label: '廖剑锋', value: '2533161' },
 { label: '程晨', value: '2533164' },
-{ label: '源子�?, value: '2533167' },
-{ label: '林英�?, value: '2533170' },
-{ label: '陈晓�?, value: '2533173' },
-{ label: '张玉�?, value: '2533176' },
-{ label: '周玉�?, value: '2533179' },
-{ label: '李莹�?, value: '2533182' },
-{ label: '高志�?, value: '2533185' },
-{ label: '阳丽�?, value: '2533188' },
-{ label: '刘慧�?, value: '2533230' },
-{ label: '周莉�?, value: '2533245' },
-{ label: '黄志�?, value: '2533317' },
-{ label: '周妍�?, value: '2533326' },
-{ label: '沈晓�?, value: '2533356' },
-{ label: '龚海�?, value: '2533431' },
-{ label: '王立�?, value: '2533446' },
-{ label: '吴俊�?, value: '2533449' },
-{ label: '周锐�?, value: '2533455' },
-{ label: '张正�?, value: '2533458' },
-{ label: '张玉�?, value: '2533461' },
+{ label: '源子淇', value: '2533167' },
+{ label: '林英红', value: '2533170' },
+{ label: '陈晓华', value: '2533173' },
+{ label: '张玉红', value: '2533176' },
+{ label: '周玉兰', value: '2533179' },
+{ label: '李莹莹', value: '2533182' },
+{ label: '高志霞', value: '2533185' },
+{ label: '阳丽芳', value: '2533188' },
+{ label: '刘慧芳', value: '2533230' },
+{ label: '周莉莉', value: '2533245' },
+{ label: '黄志强', value: '2533317' },
+{ label: '周妍妍', value: '2533326' },
+{ label: '沈晓燕', value: '2533356' },
+{ label: '龚海燕', value: '2533431' },
+{ label: '王立平', value: '2533446' },
+{ label: '吴俊峰', value: '2533449' },
+{ label: '周锐', value: '2533455' },
+{ label: '张正锋', value: '2533458' },
+{ label: '张玉凤', value: '2533461' },
 { label: '肖添', value: '2533464' },
 { label: '曾滔', value: '2533467' },
-{ label: '李云�?, value: '2533485' },
-{ label: '陈晓�?, value: '2533509' },
+{ label: '李云峰', value: '2533485' },
+{ label: '陈晓燕', value: '2533509' },
 { label: '陈翔', value: '2533518' },
-{ label: '袁皙�?, value: '2533521' },
-{ label: '冯霖�?, value: '2533527' },
-{ label: '莫美�?, value: '2533530' },
-{ label: '邹伟�?, value: '2533542' },
-{ label: '陈雅�?, value: '2533554' },
-{ label: '王雅�?, value: '2533557' },
-{ label: '蔡庚�?, value: '2533560' },
-{ label: '朱红�?, value: '2533566' },
-{ label: '杨晶�?, value: '2533569' },
-{ label: '孙雯�?, value: '2533614' },
-{ label: '罗漫�?, value: '2533617' },
-{ label: '殷梓�?, value: '2533620' }
+{ label: '袁皙雯', value: '2533521' },
+{ label: '冯霖峰', value: '2533527' },
+{ label: '莫美玲', value: '2533530' },
+{ label: '邹伟锋', value: '2533542' },
+{ label: '陈雅婷', value: '2533554' },
+{ label: '王雅婷', value: '2533557' },
+{ label: '蔡庚峰', value: '2533560' },
+{ label: '朱红燕', value: '2533566' },
+{ label: '杨晶', value: '2533569' },
+{ label: '孙雯雯', value: '2533614' },
+{ label: '罗漫玲', value: '2533617' },
+{ label: '殷梓涵', value: '2533620' }
   ]
 };
 
@@ -234,7 +234,7 @@ function handleFiles(files) {
 function removeImage(id) {
   state.images = state.images.filter(function(i) { return i.id !== id; });
   updatePreview();
-  showToast('已删�?);
+  showToast('已删除');
 }
 
 function clearAll() {
@@ -248,37 +248,7 @@ function updatePreview() {
   if (!state.images.length) { el.innerHTML = ''; return; }
   el.innerHTML = state.images.map(function(img) {
     return '<div class="preview-item"><img src="' + img.url + '"><button onclick="removeImage(\'' + img.id + '\')">×</button></div>';
-  }).join('') + '<button class="btn btn-secondary" onclick="clearAll()" style="width:100px;height:100px;font-size:24px">🗑�?/button>';
-}
-
-function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
-function maybe(v) { return Math.random() > 0.2 ? v : ''; }
-
-function generateMock(file) {
-  var names = ['张伟','李娜','王芳','刘洋','陈明','杨丽','赵强','黄敏','周杰','吴婷'];
-  var companies = ['上海科技有限公司','广州贸易有限公司','深圳电子集团','北京咨询公司','杭州互联网公�?];
-  var titles = ['总经�?,'销售总监','采购经理','技术主�?,'市场经理'];
-  var nations = ['China','USA','Germany','Japan','Korea','Vietnam','India'];
-  var continents = { China:'Asia', USA:'North America', Germany:'Europe', Japan:'Asia', Korea:'Asia', Vietnam:'Asia', India:'Asia' };
-  var name = rnd(names);
-  var nation = rnd(nations);
-  return {
-    id: genId(),
-    Name: name,
-    Title: rnd(titles),
-    email: name.toLowerCase() + '@example.com',
-    Website: maybe('www.' + rnd(companies).replace(/有限|贸易|科技|集团|咨询|互联�?g,'').toLowerCase() + '.com'),
-    Address: maybe('上海市浦东新区张江路' + Math.floor(Math.random()*1000) + '�?),
-    Company: rnd(companies),
-    Continent: continents[nation],
-    Nation: nation,
-    Phone: maybe('021-' + Math.floor(Math.random()*90000000+10000000)),
-    Mobile: '1' + Math.floor(Math.random()*90000000000+3000000000),
-    TypeOfClients: '',
-    InterestedIn: maybe('管材,管件,阀�?),
-    DemandDetails: maybe('寻找新型管材供应�?),
-    salesman: ''
-  };
+  }).join('') + '<button class="btn btn-secondary" onclick="clearAll()" style="width:100px;height:100px;font-size:24px">🗑️</button>';
 }
 
 async function callAI(files) {
@@ -290,7 +260,6 @@ async function callAI(files) {
     });
     imageContents.push({ type: 'image_url', image_url: { url: 'data:' + files[i].type + ';base64,' + base64 } });
   }
-  // 调用代理服务（API Key 在服务器端）
   var resp = await fetch(PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -318,7 +287,7 @@ async function callAI(files) {
 async function startRecognize() {
   if (!state.images.length) { alert('请先上传图片'); return; }
   document.getElementById('loading').classList.add('show');
-  document.getElementById('loading-text').textContent = 'AI 识别�?..';
+  document.getElementById('loading-text').textContent = 'AI 识别中...';
   var bar = document.getElementById('progress-bar'); bar.style.width = '0%';
   var prog = 0; var iv = setInterval(function() { prog = Math.min(prog + Math.random()*12, 85); bar.style.width = prog + '%'; }, 250);
   try {
@@ -328,12 +297,12 @@ async function startRecognize() {
       state.records = records;
       document.getElementById('loading').classList.remove('show');
       switchTab('records');
-      showToast('识别完成！共 ' + records.length + ' 条记�?);
+      showToast('识别完成！共 ' + records.length + ' 条记录');
     }, 400);
   } catch(err) {
     clearInterval(iv);
     document.getElementById('loading').classList.remove('show');
-    alert('识别失败�? + err.message);
+    alert('识别失败：' + err.message);
   }
 }
 
@@ -352,7 +321,7 @@ function renderRecords() {
 
   list.innerHTML = state.records.map(function(rec, idx) {
     return '<div class="customer-card">' +
-      '<div class="card-header"><span class="title">客户 ' + (idx+1) + '</span><span>' + (rec.Name || '未识�?) + '</span></div>' +
+      '<div class="card-header"><span class="title">客户 ' + (idx+1) + '</span><span>' + (rec.Name || '未识别') + '</span></div>' +
       '<div class="card-body">' +
         '<div class="field-grid">' +
           '<div class="field-item"><label>姓名 Name</label><input type="text" id="f-' + rec.id + '-Name" value="' + esc(rec.Name) + '"></div>' +
@@ -360,19 +329,19 @@ function renderRecords() {
           '<div class="field-item"><label>邮箱 Email *</label><input type="email" id="f-' + rec.id + '-email" value="' + esc(rec.email) + '" required></div>' +
           '<div class="field-item"><label>职位 Title</label><input type="text" id="f-' + rec.id + '-Title" value="' + esc(rec.Title) + '"></div>' +
           '<div class="field-item"><label>国家 Nation</label><input type="text" id="f-' + rec.id + '-Nation" value="' + esc(rec.Nation) + '"></div>' +
-          '<div class="field-item"><label>�?Continent</label><input type="text" id="f-' + rec.id + '-Continent" value="' + esc(rec.Continent) + '"></div>' +
+          '<div class="field-item"><label>洲 Continent</label><input type="text" id="f-' + rec.id + '-Continent" value="' + esc(rec.Continent) + '"></div>' +
           '<div class="field-item"><label>电话 Phone</label><input type="text" id="f-' + rec.id + '-Phone" value="' + esc(rec.Phone) + '"></div>' +
           '<div class="field-item"><label>手机 Mobile</label><input type="text" id="f-' + rec.id + '-Mobile" value="' + esc(rec.Mobile) + '"></div>' +
           '<div class="field-item"><label>网址 Website</label><input type="text" id="f-' + rec.id + '-Website" value="' + esc(rec.Website) + '"></div>' +
           '<div class="field-item"><label>客户类型 Type</label><select id="f-' + rec.id + '-TypeOfClients"><option value="">请选择</option>' + typeOpts + '</select></div>' +
-          '<div class="field-item"><label>感兴趣产�?/label><input type="text" id="f-' + rec.id + '-InterestedIn" value="' + esc(rec.InterestedIn) + '"></div>' +
+          '<div class="field-item"><label>感兴趣产品</label><input type="text" id="f-' + rec.id + '-InterestedIn" value="' + esc(rec.InterestedIn) + '"></div>' +
           '<div class="field-item"><label>销售员</label><select id="f-' + rec.id + '-salesman"><option value="">请选择</option>' + salesOpts + '</select></div>' +
           '<div class="field-item full"><label>地址 Address</label><input type="text" id="f-' + rec.id + '-Address" value="' + esc(rec.Address) + '"></div>' +
-          '<div class="field-item full"><label>需求详�?Demand Details</label><textarea id="f-' + rec.id + '-DemandDetails">' + esc(rec.DemandDetails) + '</textarea></div>' +
+          '<div class="field-item full"><label>需求详情 Demand Details</label><textarea id="f-' + rec.id + '-DemandDetails">' + esc(rec.DemandDetails) + '</textarea></div>' +
         '</div>' +
       '</div>' +
       '<div class="card-footer">' +
-        '<button class="btn btn-success btn-lg w-full" onclick="submitRecord(\'' + rec.id + '\')">📮 提交�?Pardot</button>' +
+        '<button class="btn btn-success btn-lg w-full" onclick="submitRecord(\'' + rec.id + '\')">📮 提交到 Pardot</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -404,7 +373,7 @@ function getRecordData(id) {
 
 function doSubmitOne(rec, onDone) {
   if (!rec.email || !rec.email.trim()) {
-    showToast('�?客户' + (state.records.indexOf(rec) + 1) + ' 邮箱为空，已跳过');
+    showToast('⚠️ 客户' + (state.records.indexOf(rec) + 1) + ' 邮箱为空，已跳过');
     onDone(false);
     return;
   }
@@ -423,7 +392,7 @@ function doSubmitOne(rec, onDone) {
     form.appendChild(input);
   }
 
-  addField('_utf8', '�?);
+  addField('_utf8', '☃');
   addField(PARDOT.FIELDS.Name, rec.Name);
   addField(PARDOT.FIELDS.Company, rec.Company);
   addField(PARDOT.FIELDS.email, rec.email);
@@ -446,17 +415,17 @@ function doSubmitOne(rec, onDone) {
 }
 
 function submitAll() {
-  if (!state.records.length) { showToast('暂无记录可提�?); return; }
+  if (!state.records.length) { showToast('暂无记录可提交'); return; }
   var total = state.records.length;
   var idx = 0;
   var success = 0;
   var skipped = 0;
   var totalEmails = state.records.filter(function(r) { return r.email && r.email.trim(); }).length;
-  if (!confirm('确认批量提交 ' + total + ' 条客户信息到 Pardot？\n（其�?' + totalEmails + ' 条有邮箱）\n\n将依次提交客户信息，全部提交完成后请确认提交结果，如有问题请按提示修改后重新提交�?)) return;
-  showToast('开始批量提�?.. �?1/' + total);
+  if (!confirm('确认批量提交 ' + total + ' 条客户信息到 Pardot？\n（其中 ' + totalEmails + ' 条有邮箱）\n\n将依次提交客户信息，全部提交完成后请确认提交结果，如有问题请按提示修改后重新提交。')) return;
+  showToast('开始批量提交... 已 1/' + total);
   function next() {
     if (idx >= state.records.length) {
-      showToast('�?批量提交完成！成�?' + success + ' 条，跳过 ' + skipped + ' 条（无邮箱）');
+      showToast('✅ 批量提交完成！成功 ' + success + ' 条，跳过 ' + skipped + ' 条（无邮箱）');
       return;
     }
     var rec = getRecordData(state.records[idx].id);
@@ -471,11 +440,11 @@ function submitAll() {
       if (ok) success++;
       idx++;
       if (idx < state.records.length) {
-        showToast('已提�?' + pos + '/' + total + '，继�?..');
+        showToast('已提交 ' + pos + '/' + total + '，继续...');
         setTimeout(next, 500);
       } else {
         if (success > 0) {
-          showToast('�?批量提交完成！成�?' + success + ' 条，跳过 ' + skipped + ' �?);
+          showToast('✅ 批量提交完成！成功 ' + success + ' 条，跳过 ' + skipped + ' 条');
         }
       }
     });
@@ -486,24 +455,23 @@ function submitAll() {
 function submitRecord(id) {
   var rec = getRecordData(id);
   if (!rec) return;
-  if (!rec.email || !rec.email.trim()) { alert('�?邮箱为必填字�?); return; }
-  if (!confirm('确认提交�?Pardot？\n\n📧 ' + rec.email + '\n🏢 ' + (rec.Company || '-') + '\n👤 ' + (rec.Name || '-'))) return;
+  if (!rec.email || !rec.email.trim()) { alert('⚠️ 邮箱为必填字段'); return; }
+  if (!confirm('确认提交到 Pardot？\n\n📧 ' + rec.email + '\n🏢 ' + (rec.Company || '-') + '\n👤 ' + (rec.Name || '-'))) return;
   doSubmitOne(rec, function(ok) {
     if (ok) {
-      // 不自动删除，让用户手动确认后再删�?      showToast('�?已在新窗口提交，请确�?Pardot 结果后手动删除记�?);
+      showToast('✅ 已在新窗口提交，请确认 Pardot 结果后手动删除记录');
     } else {
-      showToast('�?提交失败，请重试');
+      showToast('❌ 提交失败，请重试');
     }
   });
 }
 
 function deleteRecord(id) {
-  if (!confirm('确定删除这条记录�?)) return;
+  if (!confirm('确定删除这条记录？')) return;
   state.records = state.records.filter(function(r) { return r.id !== id; });
   renderRecords();
-  showToast('已删�?);
+  showToast('已删除');
 }
 </script>
 </body>
 </html>
-
