@@ -1,5 +1,5 @@
 // Vercel Serverless API Route
-// 环境变量: OPENROUTER_API_KEY, MODEL_NAME
+// 环境变量: DASHSCOPE_API_KEY, MODEL_NAME
 
 export default async function handler(req, res) {
   // 设置 CORS
@@ -18,22 +18,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const API_KEY = process.env.OPENROUTER_API_KEY;
-    const MODEL = process.env.MODEL_NAME || 'qwen/qwen3.5-flash-02-23';
+    const API_KEY = process.env.DASHSCOPE_API_KEY;
+    const MODEL = process.env.MODEL_NAME || 'qwen3.5-27B';  // 视觉模型默认用 qwen-vl-plus
 
     if (!API_KEY) {
-      return res.status(500).json({ error: 'OPENROUTER_API_KEY not configured' });
+      return res.status(500).json({ error: 'DASHSCOPE_API_KEY not configured' });
     }
 
     const { messages } = req.body;
 
-    const openrouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const dashscopeResponse = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
-        'HTTP-Referer': 'https://your-project.vercel.app',
-        'X-Title': 'RIIFO LeadCapture'
+        'Authorization': `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
         model: MODEL,
@@ -42,9 +40,9 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await openrouterResponse.json();
+    const data = await dashscopeResponse.json();
 
-    return res.status(openrouterResponse.status).json(data);
+    return res.status(dashscopeResponse.status).json(data);
   } catch (err) {
     console.error('API Error:', err);
     return res.status(500).json({ error: err.message });
