@@ -1,5 +1,9 @@
 {
+  "version": 2,
+  "buildCommand": null,
+  "outputDirectory": "src/public",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index-proxy.html" }
   ]
 }
